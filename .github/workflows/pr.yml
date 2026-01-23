@@ -21,6 +21,14 @@ jobs:
       - name: Install dependencies (monorepo)
         run: npm ci
 
+      - name: Backend lint
+        working-directory: apps/backend
+        run: npm run lint
+
+      - name: Backend tests
+        working-directory: apps/backend
+        run: npm run test
+        
       - name: Build backend
         working-directory: apps/backend
         run: npm run build
