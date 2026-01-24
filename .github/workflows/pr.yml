@@ -21,6 +21,14 @@ jobs:
       - name: Install dependencies (monorepo)
         run: npm ci
 
+      - name: Backend Lint
+        working-directory: apps/backend
+        run: npm run lint
+
+      - name: Frontend Lint
+        working-directory: apps/frontend
+        run: npm run lint
+
       - name: Build backend
         working-directory: apps/backend
         run: npm run build
@@ -28,3 +36,4 @@ jobs:
       - name: Build frontend
         working-directory: apps/frontend
         run: npm run build
+      
