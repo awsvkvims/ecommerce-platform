@@ -6,8 +6,8 @@ export type HealthResponse = {
   checks: Record<string, string>
 }
 
-export async function fetchHealth(): Promise<HealthResponse> {
-  const res = await fetch('/api/health')
+export async function fetchReadiness(): Promise<HealthResponse> {
+  const res = await fetch('/api/health/ready')
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return (await res.json()) as HealthResponse
 }

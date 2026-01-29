@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchHealth } from './api'
+import { fetchReadiness } from './api'
 
 type HealthResponse = {
   status: string
@@ -16,7 +16,7 @@ export default function App() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetchHealth()
+        const res = await fetchReadiness()
         setData(res)
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e))
