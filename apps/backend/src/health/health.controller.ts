@@ -6,9 +6,15 @@ import { HealthService } from './health.service';
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
-  @Get()
-  getHealth(@Res() res: Response) {
-    const result = this.healthService.getHealth();
+  @Get('live')
+  live(@Res() res: Response) {
+    const result = this.healthService.getLiveness();
+    return res.status(result.httpStatus).json(result.body);
+  }
+
+  @Get('ready')
+  ready(@Res() res: Response) {
+    const result = this.healthService.getReadiness();
     return res.status(result.httpStatus).json(result.body);
   }
 }
