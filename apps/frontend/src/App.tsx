@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { fetchHealth } from './api'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+type HealthResponse = {
+  status: string
+  service: string
+  version: string
+  timestamp: string
+  checks: Record<string, string>
 }
 
-export default App
+export default function App() {
+  const [data, setData] = useState<HealthResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetchHealth()
+        setData(res)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e))
+      }
+    }
+    load()
+  }, [])
+
+  return (
+    <div style={{ padding: 16, fontFamily: 'system-ui' }}>
+      <h1>Platform Learning App</h1>
+
+      <h2>Backend Health</h2>
+      {error && <p style={{ color: 'crimson' }}>Error: {error}</p>}
+      {!error && !data && <p>Loading…</p>}
+      {data && (
+        <pre style={{ background: '#f6f8fa', padding: 12, borderRadius: 8 }}>
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
+    </div>
+  )
+}
