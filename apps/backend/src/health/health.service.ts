@@ -6,6 +6,7 @@ export interface HealthResponse {
   status: HealthStatus;
   service: string;
   version: string;
+  env: string;
   timestamp: string;
   checks: Record<string, 'ok' | 'fail'>;
 }
@@ -14,11 +15,13 @@ export interface HealthResponse {
 export class HealthService {
   private readonly serviceName = 'backend';
   private readonly version = process.env.APP_VERSION ?? 'dev';
+  private readonly env = process.env.APP_ENV ?? 'local';
 
   private baseResponse(): Omit<HealthResponse, 'status' | 'checks'> {
     return {
       service: this.serviceName,
       version: this.version,
+      env: this.env,
       timestamp: new Date().toISOString(),
     };
   }
