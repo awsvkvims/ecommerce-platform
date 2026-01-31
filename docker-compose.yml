@@ -1,0 +1,21 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      APP_ENV: local
+      APP_VERSION: "0.1.0"
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+      
+      
