@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,10 +25,6 @@ jobs:
         working-directory: apps/backend
         run: npm run lint
 
-      - name: Frontend Lint
-        working-directory: apps/frontend
-        run: npm run lint
-
       - name: Backend tests
         working-directory: apps/backend
         run: npm run test
@@ -37,16 +33,34 @@ jobs:
         working-directory: apps/backend
         run: npm run build
 
+  frontend:
+    name: Frontend (lint/build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies (monorepo)
+        run: npm ci
+
+      - name: Frontend Lint
+        working-directory: apps/frontend
+        run: npm run lint
+
+      - name: Frontend tests
+        working-directory: apps/frontend
+        run: npm run test --if-present
+
       - name: Build frontend
         working-directory: apps/frontend
         run: npm run build
 
-      - name: Build backend Docker image
-        run: docker build -t ecommerce-backend:ci -f apps/backend/Dockerfile .
-
-      - name: Build frontend Docker image
-        run: docker build -t ecommerce-frontend:ci -f apps/frontend/Dockerfile .  
-  
   terraform:
     name: Terraform (fmt/validate)
     runs-on: ubuntu-latest
