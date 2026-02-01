@@ -22,4 +22,3 @@ pnpm-debug.log*
 **/.terraform/*
 *.tfstate
 *.tfstate.*
-.terraform.lock.hcl
