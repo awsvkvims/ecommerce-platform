@@ -96,7 +96,7 @@ jobs:
             > taskdef-registered.json
 
           REVISION_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' taskdef-registered.json)
-          echo "TASK_DEFINITION_ARN=${REVISION_ARN}" >> $GITHUB_ENV
+          echo "TASK_DEFINITION_ARN=${REVISION_ARN}" >> "$GITHUB_ENV"
           echo "Registered: ${REVISION_ARN}"
 
       - name: Update ECS service
