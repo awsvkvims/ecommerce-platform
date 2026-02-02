@@ -45,3 +45,78 @@ jobs:
             -f apps/backend/Dockerfile \
             . \
             --push
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Render new task definition (update image)
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          ECR_BACKEND_REPO: ${{ vars.ECR_BACKEND_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+          TASK_FAMILY: ecommerce-platform-dev-backend
+        run: |
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_BACKEND_REPO}:${IMAGE_TAG}"
+
+          echo "Using image: ${IMAGE_URI}"
+
+          aws ecs describe-task-definition \
+            --task-definition "${TASK_FAMILY}" \
+            --region "${AWS_REGION}" \
+            > taskdef.json
+
+          # Create a new task definition JSON with just the fields ECS accepts on register
+          jq --arg IMAGE "${IMAGE_URI}" '
+            .taskDefinition
+            | .containerDefinitions[0].image = $IMAGE
+            | {
+                family: .family,
+                taskRoleArn: .taskRoleArn,
+                executionRoleArn: .executionRoleArn,
+                networkMode: .networkMode,
+                containerDefinitions: .containerDefinitions,
+                requiresCompatibilities: .requiresCompatibilities,
+                cpu: .cpu,
+                memory: .memory
+              }
+          ' taskdef.json > taskdef-new.json
+
+          cat taskdef-new.json
+
+      - name: Register new task definition revision
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws ecs register-task-definition \
+            --cli-input-json file://taskdef-new.json \
+            --region "${AWS_REGION}" \
+            > taskdef-registered.json
+
+          REVISION_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' taskdef-registered.json)
+          echo "TASK_DEFINITION_ARN=${REVISION_ARN}" >> $GITHUB_ENV
+          echo "Registered: ${REVISION_ARN}"
+
+      - name: Update ECS service
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER: ecommerce-platform-dev-ecs
+          SERVICE: ecommerce-platform-dev-backend
+        run: |
+          aws ecs update-service \
+            --cluster "${CLUSTER}" \
+            --service "${SERVICE}" \
+            --task-definition "${TASK_DEFINITION_ARN}" \
+            --region "${AWS_REGION}"
+
+      - name: Wait for service stability
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER: ecommerce-platform-dev-ecs
+          SERVICE: ecommerce-platform-dev-backend
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${CLUSTER}" \
+            --services "${SERVICE}" \
+            --region "${AWS_REGION}"

@@ -16,3 +16,13 @@ Workflow:
 
 Next step:
 - Deploy that image to the dev ECS service (rolling update via ALB health checks)
+
+## Phase 4.2.B: Deploy to ECS (dev)
+
+After publishing the backend image to ECR, the workflow registers a new ECS task definition revision
+that points to the new image tag (Git SHA), then updates the ECS service to that revision and waits
+for stability.
+
+This creates an auditable deployment trail:
+commit → image tag → task definition revision → running tasks
+
