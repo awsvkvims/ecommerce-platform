@@ -57,6 +57,7 @@ jobs:
           ECR_BACKEND_REPO: ${{ vars.ECR_BACKEND_REPO }}
           IMAGE_TAG: ${{ github.sha }}
           TASK_FAMILY: ${{ vars.TASK_DEFINITION_FAMILY }}
+          APP_ENV: ${{ vars.APP_ENV }}
         run: |
           ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
           IMAGE_URI="${ECR_REGISTRY}/${ECR_BACKEND_REPO}:${IMAGE_TAG}"
