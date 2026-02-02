@@ -20,3 +20,4 @@ A full-stack ecommerce application using:
 ## Docs
 
 - [Architecture Overview](docs/architecture/overview.md)
+- [CD Authentication (Keys now, OIDC later)](../devops/cd-authentication.md)

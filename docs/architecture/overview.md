@@ -52,6 +52,10 @@ On merge to `main`, a CD workflow will:
 
 (Then later: staging/prod with manual approvals via GitHub Environments.)
 
+## CD authentication
+
+See: [CD Authentication (Keys now, OIDC later)](../devops/cd-authentication.md)
+
 ## Traceability
 
 This repo tries to keep docs close to implementation:
