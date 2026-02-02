@@ -22,3 +22,4 @@ A full-stack ecommerce application using:
 - [Architecture Overview](docs/architecture/overview.md)
 - [CD Authentication (Keys now, OIDC later)](docs/devops/cd-authentication.md)
 - [CD Strategy](docs/devops/cd-strategy.md)
+- [CI Strategy](docs/devops/ci-strategy.md)

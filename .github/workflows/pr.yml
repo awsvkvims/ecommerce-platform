@@ -5,6 +5,14 @@ on:
     branches: [ "main" ]
 
 jobs:
+  actionlint:
+    name: Workflow lint (actionlint)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: devops-actions/actionlint@v0.1.10
   backend:
     runs-on: ubuntu-latest
 
