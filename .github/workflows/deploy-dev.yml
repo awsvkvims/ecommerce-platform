@@ -81,6 +81,7 @@ jobs:
                 cpu: .cpu,
                 memory: .memory
               }
+            | with_entries(select(.value != null))
           ' taskdef.json > taskdef-new.json
 
           cat taskdef-new.json
