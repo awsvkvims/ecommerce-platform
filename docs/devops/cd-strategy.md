@@ -31,3 +31,4 @@ commit → image tag → task definition revision → running tasks
 When generating a new task definition JSON for `register-task-definition`, some fields may be null
 (e.g., `taskRoleArn` if no task role is configured). AWS CLI rejects null for string fields, so the
 workflow filters out null entries before registering the new revision.
+
