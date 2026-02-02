@@ -1,0 +1,5 @@
+runner-label:
+  - self-hosted
+  - self-hosted-mac
+  - macos
+  - arm64
