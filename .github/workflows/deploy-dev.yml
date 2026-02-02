@@ -1,0 +1,47 @@
+name: Deploy Dev (publish backend image)
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-backend:
+    name: Publish backend image to ECR (dev)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push (linux/amd64)
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_BACKEND_REPO: ${{ vars.ECR_BACKEND_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_BACKEND_REPO}:${IMAGE_TAG}"
+
+          echo "Building and pushing: ${IMAGE_URI}"
+
+          docker buildx create --use
+          docker buildx build \
+            --platform linux/amd64 \
+            -t "${IMAGE_URI}" \
+            -f apps/backend/Dockerfile \
+            . \
+            --push
