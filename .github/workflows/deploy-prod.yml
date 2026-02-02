@@ -1,0 +1,91 @@
+name: Deploy Prod (promote backend image)
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "ECR image tag to deploy (usually a commit SHA)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-backend:
+    name: Deploy backend to ECS (prod)
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Render new task definition (update image)
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          ECR_BACKEND_REPO: ${{ vars.ECR_BACKEND_REPO }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          TASK_FAMILY: ${{ vars.TASK_DEFINITION_FAMILY }}
+          APP_ENV: ${{ vars.APP_ENV }}
+        run: |
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_BACKEND_REPO}:${IMAGE_TAG}"
+
+          echo "Deploying image: ${IMAGE_URI}"
+
+          aws ecs describe-task-definition \
+            --task-definition "${TASK_FAMILY}" \
+            --region "${AWS_REGION}" \
+            > taskdef.json
+
+          jq --arg IMAGE "${IMAGE_URI}" \
+             --arg APP_VERSION "${IMAGE_TAG}" \
+             --arg APP_ENV "${APP_ENV}" \
+             -f scripts/render-taskdef.jq taskdef.json > taskdef-new.json
+
+      - name: Register new task definition revision
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws ecs register-task-definition \
+            --cli-input-json file://taskdef-new.json \
+            --region "${AWS_REGION}" \
+            > taskdef-registered.json
+
+          REVISION_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' taskdef-registered.json)
+          echo "TASK_DEFINITION_ARN=${REVISION_ARN}" >> "$GITHUB_ENV"
+          echo "Registered: ${REVISION_ARN}"
+
+      - name: Update ECS service
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER: ${{ vars.ECS_CLUSTER_NAME }}
+          SERVICE: ${{ vars.ECS_SERVICE_NAME }}
+        run: |
+          aws ecs update-service \
+            --cluster "${CLUSTER}" \
+            --service "${SERVICE}" \
+            --task-definition "${TASK_DEFINITION_ARN}" \
+            --region "${AWS_REGION}"
+
+      - name: Wait for service stability
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLUSTER: ${{ vars.ECS_CLUSTER_NAME }}
+          SERVICE: ${{ vars.ECS_SERVICE_NAME }}
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${CLUSTER}" \
+            --services "${SERVICE}" \
+            --region "${AWS_REGION}"
