@@ -32,3 +32,9 @@ and reads variables via:
 - `${{ vars.ECS_CLUSTER_NAME }}` etc.
 
 This keeps the workflow reusable across environments.
+
+## Approvals
+
+- `dev`: no approval (auto-deploy on merge to `main`)
+- `staging`: manual approval required before deployment steps run
+- `prod`: manual approval required before deployment steps run
