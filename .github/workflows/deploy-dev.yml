@@ -11,6 +11,7 @@ jobs:
   publish-backend:
     name: Publish backend image to ECR (dev)
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Checkout
@@ -55,7 +56,8 @@ jobs:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           ECR_BACKEND_REPO: ${{ vars.ECR_BACKEND_REPO }}
           IMAGE_TAG: ${{ github.sha }}
-          TASK_FAMILY: ecommerce-platform-dev-backend
+          TASK_FAMILY: ${{ vars.TASK_DEFINITION_FAMILY }}
+          APP_ENV: ${{ vars.APP_ENV }}
         run: |
           ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
           IMAGE_URI="${ECR_REGISTRY}/${ECR_BACKEND_REPO}:${IMAGE_TAG}"
@@ -70,7 +72,7 @@ jobs:
           # Create a new task definition JSON with just the fields ECS accepts on register
           jq --arg IMAGE "${IMAGE_URI}" \
              --arg APP_VERSION "${IMAGE_TAG}" \
-             --arg APP_ENV "dev" \
+             --arg APP_ENV "${APP_ENV}" \
              -f scripts/render-taskdef.jq taskdef.json > taskdef-new.json
 
           cat taskdef-new.json
@@ -91,8 +93,8 @@ jobs:
       - name: Update ECS service
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          CLUSTER: ecommerce-platform-dev-ecs
-          SERVICE: ecommerce-platform-dev-backend
+          CLUSTER: ${{ vars.ECS_CLUSTER_NAME }}
+          SERVICE: ${{ vars.ECS_SERVICE_NAME }}
         run: |
           aws ecs update-service \
             --cluster "${CLUSTER}" \
@@ -103,8 +105,8 @@ jobs:
       - name: Wait for service stability
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
-          CLUSTER: ecommerce-platform-dev-ecs
-          SERVICE: ecommerce-platform-dev-backend
+          CLUSTER: ${{ vars.ECS_CLUSTER_NAME }}
+          SERVICE: ${{ vars.ECS_SERVICE_NAME }}
         run: |
           aws ecs wait services-stable \
             --cluster "${CLUSTER}" \
