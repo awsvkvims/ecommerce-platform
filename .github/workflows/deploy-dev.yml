@@ -68,21 +68,10 @@ jobs:
             > taskdef.json
 
           # Create a new task definition JSON with just the fields ECS accepts on register
-          jq --arg IMAGE "${IMAGE_URI}" '
-            .taskDefinition
-            | .containerDefinitions[0].image = $IMAGE
-            | {
-                family: .family,
-                taskRoleArn: .taskRoleArn,
-                executionRoleArn: .executionRoleArn,
-                networkMode: .networkMode,
-                containerDefinitions: .containerDefinitions,
-                requiresCompatibilities: .requiresCompatibilities,
-                cpu: .cpu,
-                memory: .memory
-              }
-            | with_entries(select(.value != null))
-          ' taskdef.json > taskdef-new.json
+          jq --arg IMAGE "${IMAGE_URI}" \
+             --arg APP_VERSION "${IMAGE_TAG}" \
+             --arg APP_ENV "dev" \
+             -f scripts/render-taskdef.jq taskdef.json > taskdef-new.json
 
           cat taskdef-new.json
 
