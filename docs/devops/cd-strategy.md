@@ -31,3 +31,9 @@ commit → image tag → task definition revision → running tasks
 When generating a new task definition JSON for `register-task-definition`, some fields may be null
 (e.g., `taskRoleArn` if no task role is configured). AWS CLI rejects null for string fields, so the
 workflow filters out null entries before registering the new revision.
+
+## Runtime versioning (commit SHA)
+
+The dev deployment injects `APP_VERSION=<git sha>` into the ECS task definition.
+The backend exposes this in `/api/health/*` responses, enabling direct traceability from:
+commit → image → task definition → running service.
