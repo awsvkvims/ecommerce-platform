@@ -7,14 +7,14 @@ on:
 jobs:
   actionlint:
     name: Workflow lint (actionlint)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macos, arm64]
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: devops-actions/actionlint@v0.1.10
   backend:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macos, arm64]
 
     steps:
       - name: Checkout
@@ -38,7 +38,7 @@ jobs:
 
   frontend:
     name: Frontend (lint/build)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macos, arm64]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,7 +67,7 @@ jobs:
 
   terraform:
     name: Terraform (fmt/validate)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, macos, arm64]
     defaults:
       run:
         working-directory: infra/dev
