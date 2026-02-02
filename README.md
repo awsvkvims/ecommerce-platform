@@ -17,3 +17,5 @@ Goal: learn modern enterprise software development end-to-end.
 - Database: PostgreSQL (RDS)
 - CI/CD: GitHub Actions
 - IaC: Terraform
+
+<!-- PR CI test -->
