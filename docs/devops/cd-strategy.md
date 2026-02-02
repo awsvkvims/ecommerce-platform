@@ -38,3 +38,10 @@ We keep complex JSON transforms in dedicated files (e.g., `scripts/render-taskde
 instead of embedding them inline in YAML. This improves readability, reviewability,
 and allows local testing.
 
+## Reusable deploy workflow
+
+Staging and prod deployments call a reusable workflow to avoid duplication:
+
+- Reusable: `.github/workflows/_deploy-backend-ecs.yml`
+- Wrappers: `.github/workflows/deploy-staging.yml`, `.github/workflows/deploy-prod.yml`
+
