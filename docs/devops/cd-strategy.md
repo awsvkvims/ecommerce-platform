@@ -32,3 +32,9 @@ When generating a new task definition JSON for `register-task-definition`, some 
 (e.g., `taskRoleArn` if no task role is configured). AWS CLI rejects null for string fields, so the
 workflow filters out null entries before registering the new revision.
 
+## Workflow maintainability
+
+We keep complex JSON transforms in dedicated files (e.g., `scripts/render-taskdef.jq`)
+instead of embedding them inline in YAML. This improves readability, reviewability,
+and allows local testing.
+
