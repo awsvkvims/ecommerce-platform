@@ -17,4 +17,6 @@ A full-stack ecommerce application using:
 - CI/CD: GitHub Actions
 - IaC: Terraform
 
-<!-- PR CI test -->
+## Docs
+
+- [Architecture Overview](docs/architecture/overview.md)
