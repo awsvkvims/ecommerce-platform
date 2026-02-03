@@ -51,6 +51,7 @@ The runner is installed outside the repository to avoid accidental commits.
 ```bash
 mkdir -p ~/actions-runner
 cd ~/actions-runner
+```
 
 ## Installation steps
 
@@ -65,20 +66,24 @@ While running, the terminal must remain open.
 Operational considerations
 
 Capacity
-	•	One runner executes one job at a time
-	•	Jobs will queue sequentially
+	- One runner executes one job at a time
+	- Jobs will queue sequentially
 
 Availability
-	•	If the Mac is asleep or offline, PR checks will queue
-	•	Restart the runner by re-running ./run.sh
+	- If the Mac is asleep or offline, PR checks will queue
+	- Restart the runner by re-running ./run.sh
 
 Security
-	•	Runner executes code from PRs
-	•	Only trusted collaborators should have push access
-	•	Secrets are injected via GitHub Actions, not stored locally
+	- Runner executes code from PRs
+	- Only trusted collaborators should have push access
+	- Secrets are injected via GitHub Actions, not stored locally
 
-⸻
 
 Trade-offs vs GitHub-hosted runners
 
-
+| Aspect | GitHub-hosted | Self-hosted |
+|---|---|---|
+|Availability | Best effort | Deterministic|
+| Maintenance | None.       | Required|
+| Cost | Free| Local resources | 
+| Control | Limited | Full |
