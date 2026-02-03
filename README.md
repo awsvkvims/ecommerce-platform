@@ -27,5 +27,6 @@ A full-stack ecommerce application using:
 - [CD Strategy](docs/devops/cd-strategy.md)
 - [GitHub Environments](docs/devops/environments.md)
 
+- [Self-Hosted GitHub Actions Runner](docs/devops/github-actions/self-hosted-runner.md)
 
 
