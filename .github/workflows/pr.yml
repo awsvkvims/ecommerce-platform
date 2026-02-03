@@ -5,14 +5,26 @@ on:
     branches: [ "main" ]
 
 jobs:
-  actionlint:
-    name: Workflow lint (actionlint)
-    runs-on: [self-hosted, macos, arm64]
+  actionlint_hosted:
+    name: Workflow lint (hosted)
+    if: ${{ vars.RUNNER_MODE == 'hosted' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: devops-actions/actionlint@v0.1.10
+  
+  actionlint_self_hosted:
+    name: Workflow lint (self-hosted)
+    if: ${{ vars.RUNNER_MODE == 'self-hosted' }}
+    runs-on: [self-hosted, macos, arm64]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: devops-actions/actionlint@v0.1.10    
+
   backend:
     runs-on: [self-hosted, macos, arm64]
 

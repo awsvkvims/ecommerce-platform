@@ -63,23 +63,23 @@ The runner is configured interactively and started with:
 
 While running, the terminal must remain open.
 
-Operational considerations
+## Operational considerations
 
-Capacity
-	- One runner executes one job at a time
-	- Jobs will queue sequentially
+# Capacity
+- One runner executes one job at a time
+- Jobs will queue sequentially
 
-Availability
-	- If the Mac is asleep or offline, PR checks will queue
-	- Restart the runner by re-running ./run.sh
+# Availability
+- If the Mac is asleep or offline, PR checks will queue
+- Restart the runner by re-running ./run.sh
 
-Security
-	- Runner executes code from PRs
-	- Only trusted collaborators should have push access
-	- Secrets are injected via GitHub Actions, not stored locally
+# Security
+- Runner executes code from PRs
+- Only trusted collaborators should have push access
+- Secrets are injected via GitHub Actions, not stored locally
 
 
-Trade-offs vs GitHub-hosted runners
+## Trade-offs vs GitHub-hosted runners
 
 | Aspect | GitHub-hosted | Self-hosted |
 |---|---|---|
