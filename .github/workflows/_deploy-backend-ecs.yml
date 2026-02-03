@@ -32,6 +32,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2          
+
+      - name: Promote image to target environment ECR
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          SOURCE_REPO: ${{ vars.SOURCE_ECR_BACKEND_REPO }}
+          TARGET_REPO: ${{ vars.TARGET_ECR_BACKEND_REPO }}
+        run: |
+          set -e
+
+          SRC_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${SOURCE_REPO}:${IMAGE_TAG}"
+          DST_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${TARGET_REPO}:${IMAGE_TAG}"
+
+          echo "Pulling $SRC_IMAGE"
+          docker pull "$SRC_IMAGE"
+
+          echo "Tagging as $DST_IMAGE"
+          docker tag "$SRC_IMAGE" "$DST_IMAGE"
+
+          echo "Pushing $DST_IMAGE"
+          docker push "$DST_IMAGE"
+    
+
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
