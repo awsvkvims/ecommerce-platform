@@ -15,4 +15,5 @@ jobs:
     uses: ./.github/workflows/_deploy-backend-ecs.yml
     with:
       environment_name: prod
+      secrets: inherit
       image_tag: ${{ inputs.image_tag }}

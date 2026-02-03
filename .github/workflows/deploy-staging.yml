@@ -13,6 +13,7 @@ permissions:
 jobs:
   deploy:
     uses: ./.github/workflows/_deploy-backend-ecs.yml
+    secrets: inherit
     with:
       environment_name: staging
       image_tag: ${{ inputs.image_tag }}
