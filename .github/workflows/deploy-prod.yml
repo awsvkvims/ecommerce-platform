@@ -13,7 +13,7 @@ permissions:
 jobs:
   deploy:
     uses: ./.github/workflows/_deploy-backend-ecs.yml
+    secrets: inherit
     with:
       environment_name: prod
-      secrets: inherit
       image_tag: ${{ inputs.image_tag }}
